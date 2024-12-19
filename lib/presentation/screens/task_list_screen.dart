@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../domain/entities/task.dart';
 import '../providers/task_provider.dart';
 import '../shared/widgets/elevation_button.dart';
 import '../shared/widgets/task_item.dart';
@@ -48,10 +49,14 @@ class TaskListScreen extends ConsumerWidget {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: taskState.filteredTasks.length,
+                itemCount: taskState.tasks.length,
                 itemBuilder: (context, index) {
                   final task = taskState.tasks[index];
-                  return TaskItem(task: task);
+                  if (_shouldShowTask(task, taskState.filter)) {
+                    return TaskItem(task: task);
+                  } else {
+                    return const SizedBox.shrink();
+                  }
                 },
               ),
             )
@@ -69,5 +74,17 @@ class TaskListScreen extends ConsumerWidget {
           backgroundColor: Colors.indigo,
           foregroundColor: Colors.white,
         ));
+  }
+
+  bool _shouldShowTask(Task task, TaskFilter filter) {
+    switch (filter) {
+      case TaskFilter.completed:
+        return task.isCompleted;
+      case TaskFilter.pending:
+        return !task.isCompleted;
+      case TaskFilter.all:
+      default:
+        return true;
+    }
   }
 }

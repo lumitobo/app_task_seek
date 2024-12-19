@@ -33,13 +33,6 @@ class TaskState {
     );
   }
 
-  List<Task> get filteredTasks {
-    switch (filter) {
-      case TaskFilter.completed: return tasks.where((task) => task.isCompleted).toList();
-      case TaskFilter.pending:   return tasks.where((task) => !task.isCompleted).toList();
-      default: return tasks;
-    }
-  }
 }
 
 class TaskNotifier extends StateNotifier<TaskState> {
@@ -103,6 +96,11 @@ class TaskNotifier extends StateNotifier<TaskState> {
 
     final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
     editTaskRepository(updatedTask);
+
+    state = state.copyWith(
+      tasks: [...state.tasks], // Esto forza la actualización del estado de las tareas
+      filter: state.filter, // Mantén el filtro actual
+    );
   }
 
   void editTask(Task task, String newTitle, String newCategory) async{

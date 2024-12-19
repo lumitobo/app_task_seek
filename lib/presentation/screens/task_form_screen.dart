@@ -79,26 +79,29 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                 },
               ),
               const SizedBox(height: 20),
-              CustomFilledButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    if (_isEditing) {
-                      taskNotifier.editTask(
-                        widget.task!,
-                        _titleController.text,
-                        _categoryController.text,
-                      );
-                    } else {
-                      taskNotifier.addTask(
-                        _titleController.text,
-                        _categoryController.text,
-                      );
+              SizedBox(
+                width: double.infinity,
+                child: CustomFilledButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save();
+                      if (_isEditing) {
+                        taskNotifier.editTask(
+                          widget.task!,
+                          _titleController.text,
+                          _categoryController.text,
+                        );
+                      } else {
+                        taskNotifier.addTask(
+                          _titleController.text,
+                          _categoryController.text,
+                        );
+                      }
+                      context.pop();
                     }
-                    context.pop();
-                  }
-                },
-                text: _isEditing ? 'Guardar Cambios' : 'Añadir Tarea',
+                  },
+                  text: _isEditing ? 'Guardar Cambios' : 'Añadir Tarea',
+                ),
               ),
             ],
           ),
