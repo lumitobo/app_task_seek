@@ -33,13 +33,13 @@ android {
         debug {
             keyAlias 'key_task'
             keyPassword 'keytaskseek'
-            storeFile file('key_task.jks')
+            storeFile file('../../key_task.jks')
             storePassword 'keytaskseek'
         }
         release {
             keyAlias 'key_task'
             keyPassword 'keytaskseek'
-            storeFile file('key_task.jks')
+            storeFile file('../../key_task.jks')
             storePassword 'keytaskseek'
         }
     }
