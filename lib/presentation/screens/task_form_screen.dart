@@ -1,6 +1,8 @@
+import 'package:app_task_seek/config/router/app_router.dart';
 import 'package:app_task_seek/presentation/shared/widgets/custom_filled_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../domain/entities/task.dart';
 import '../providers/task_provider.dart';
@@ -93,7 +95,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                         _categoryController.text,
                       );
                     }
-                    Navigator.pop(context);
+                    context.pop();
                   }
                 },
                 text: _isEditing ? 'Guardar Cambios' : 'Añadir Tarea',

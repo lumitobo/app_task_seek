@@ -86,9 +86,9 @@ Task _taskDeserialize(
     category: reader.readString(offsets[0]),
     id: reader.readString(offsets[1]),
     isCompleted: reader.readBoolOrNull(offsets[2]) ?? false,
+    isarId: id,
     title: reader.readString(offsets[3]),
   );
-  object.isarId = id;
   return object;
 }
 

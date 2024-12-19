@@ -5,22 +5,59 @@ import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 
+abstract class DirectoryProvider {
+  Future<String> getDirectoryPath();
+}
+
+class DefaultDirectoryProvider implements DirectoryProvider {
+  @override
+  Future<String> getDirectoryPath() async {
+    final dir = await getApplicationDocumentsDirectory();
+    return dir.path;
+  }
+}
+
+/// Abstracción para crear la instancia de Isar
+abstract class IsarFactory {
+  Future<Isar> createIsar(String directoryPath);
+}
+
+class DefaultIsarFactory implements IsarFactory {
+  @override
+  Future<Isar> createIsar(String directoryPath) async {
+    if (Isar.instanceNames.isEmpty) {
+      return await Isar.open(
+        [TaskSchema],
+        inspector: true,
+        directory: directoryPath,
+      );
+    }
+    return Future.value(Isar.getInstance());
+  }
+}
+
 class IsarDatasourceImpl extends LocalDBDatasource {
+  final DirectoryProvider directoryProvider;
+  final IsarFactory isarFactory;
 
   late Future<Isar> isarDB;
 
-  IsarDatasourceImpl(){
-    isarDB = openDB();
+  IsarDatasourceImpl({
+    required this.directoryProvider,
+    required this.isarFactory,
+  }) {
+    isarDB = _initializeDB();
   }
 
-  Future<Isar> openDB() async {
+  Future<Isar> _initializeDB() async {
+    final directoryPath = await directoryProvider.getDirectoryPath();
+    return await isarFactory.createIsar(directoryPath);
+  }
 
-    final dir = await getApplicationDocumentsDirectory();
-    if (Isar.instanceNames.isEmpty) {
-      return await Isar.open( [ TaskSchema ], inspector: true, directory: dir.path);
-    }
-
-    return Future.value(Isar.getInstance());
+  @override
+  Future<List<Task>> getTasks({int limit = 10, offset = 0}) async {
+    final isar = await isarDB;
+    return isar.tasks.where().findAll();
   }
 
   @override
@@ -30,10 +67,7 @@ class IsarDatasourceImpl extends LocalDBDatasource {
     final existTask = await isar.tasks.filter().idEqualTo(task.id).findFirst();
 
     if(existTask == null){
-      isar.writeTxn(() async => isar.tasks.put(task));
-    }
-    else {
-      // TODO: desarrollar cuando el id de la tarea que se quiere agregar ya se encuentre en la base de datos
+      isar.writeTxn(() async => await isar.tasks.put(task));
     }
 
   }
@@ -54,11 +88,6 @@ class IsarDatasourceImpl extends LocalDBDatasource {
     }
   }
 
-  @override
-  Future<List<Task>> getTasks({int limit = 10, offset = 0}) async {
-    final isar = await isarDB;
-    return isar.tasks.where().offset(offset).limit(limit).findAll();
-  }
 
   @override
   Future<bool> removeTask(Task task) async {

@@ -56,7 +56,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
 
     try {
 
-      final tasks = await localDBRepository.getTasks();
+      final List<Task> tasks = await localDBRepository.getTasks();
 
       state = state.copyWith(isLoading: false, tasks: tasks);
 
@@ -130,7 +130,10 @@ class TaskNotifier extends StateNotifier<TaskState> {
 }
 
 final taskProvider = StateNotifierProvider<TaskNotifier, TaskState>((ref) {
-  final localDBRepository = LocalDBRepositoryImpl(IsarDatasourceImpl());
+  final localDBRepository = LocalDBRepositoryImpl(IsarDatasourceImpl(
+    directoryProvider: DefaultDirectoryProvider(),
+    isarFactory: DefaultIsarFactory(),
+  ));
 
   return TaskNotifier(localDBRepository: localDBRepository);
 });
